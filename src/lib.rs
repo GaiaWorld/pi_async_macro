@@ -289,12 +289,12 @@ fn parse_async_macro(mut input: syn::ItemFn,
                 let pool_type_name = syn::Ident::new(&pool_type, Span::call_site());
                 quote_spanned! {last_stmt_start_span=>
                     let pool = #pool_type_name::default();
-                    let runner = r#async::rt::single_thread::SingleTaskRunner::<(), _>::new(pool);
+                    let runner = pi_async::rt::single_thread::SingleTaskRunner::<(), _>::new(pool);
                 }
             } else {
                 //未指定任务池
                 quote_spanned! {last_stmt_start_span=>
-                    let runner = r#async::rt::single_thread::SingleTaskRunner::<(), _>::default();
+                    let runner = pi_async::rt::single_thread::SingleTaskRunner::<(), _>::default();
                 }
             }
         },
@@ -304,12 +304,12 @@ fn parse_async_macro(mut input: syn::ItemFn,
                 let pool_type_name = syn::Ident::new(&pool_type, Span::call_site());
                 quote_spanned! {last_stmt_start_span=>
                     let pool = #pool_type_name::default();
-                    r#async::rt::multi_thread::MultiTaskRuntimeBuilder::<(), _>::new(pool)
+                    pi_async::rt::multi_thread::MultiTaskRuntimeBuilder::<(), _>::new(pool)
                 }
             } else {
                 //未指定任务池
                 quote_spanned! {last_stmt_start_span=>
-                    r#async::rt::multi_thread::MultiTaskRuntimeBuilder::<(), _>::default()
+                    pi_async::rt::multi_thread::MultiTaskRuntimeBuilder::<(), _>::default()
                 }
             }
         },
@@ -347,7 +347,7 @@ fn parse_async_macro(mut input: syn::ItemFn,
                         let rt = runner.startup().unwrap();
                         let rt_copy = rt.clone();
                         let thread_waker = runner.get_thread_waker().unwrap();
-                        r#async::rt::spawn_worker_thread("Default-Main-RT",
+                        pi_async::rt::spawn_worker_thread("Default-Main-RT",
                             2 * 1024 * 1024,
                             Arc::new(AtomicBool::new(true)),
                             thread_waker,
@@ -375,7 +375,7 @@ fn parse_async_macro(mut input: syn::ItemFn,
                         let rt = runner.startup().unwrap();
                         let rt_copy = rt.clone();
                         let thread_waker = runner.get_thread_waker().unwrap();
-                        r#async::rt::spawn_worker_thread("Default-Main-RT",
+                        pi_async::rt::spawn_worker_thread("Default-Main-RT",
                             2 * 1024 * 1024,
                             Arc::new(AtomicBool::new(true)),
                             thread_waker,
