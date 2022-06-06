@@ -112,9 +112,6 @@ impl AsyncRuntimeConfig {
     //设置运行时定时器间隔
     fn set_timer_interval(&mut self, timer_interval: syn::Lit, span: Span) -> Result<(), syn::Error> {
         let timer_interval = parse_int(timer_interval, span, "timer_interval")?;
-        if timer_interval < 0 {
-            return Err(syn::Error::new(span, "Set timer interval failed, reason: `timer_interval` may not be less 0"));
-        }
         self.timer_interval = Some(timer_interval);
 
         Ok(())
