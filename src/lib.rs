@@ -286,12 +286,12 @@ fn parse_async_macro(mut input: syn::ItemFn,
                 let pool_type_name = syn::Ident::new(&pool_type, Span::call_site());
                 quote_spanned! {last_stmt_start_span=>
                     let pool = #pool_type_name::default();
-                    let runner = pi_async::rt::single_thread::SingleTaskRunner::<(), _>::new(pool);
+                    let runner = pi_async_rt::rt::single_thread::SingleTaskRunner::<(), _>::new(pool);
                 }
             } else {
                 //未指定任务池
                 quote_spanned! {last_stmt_start_span=>
-                    let runner = pi_async::rt::single_thread::SingleTaskRunner::<(), _>::default();
+                    let runner = pi_async_rt::rt::single_thread::SingleTaskRunner::<(), _>::default();
                 }
             }
         },
@@ -301,12 +301,12 @@ fn parse_async_macro(mut input: syn::ItemFn,
                 let pool_type_name = syn::Ident::new(&pool_type, Span::call_site());
                 quote_spanned! {last_stmt_start_span=>
                     let pool = #pool_type_name::default();
-                    pi_async::rt::multi_thread::MultiTaskRuntimeBuilder::<(), _>::new(pool)
+                    pi_async_rt::rt::multi_thread::MultiTaskRuntimeBuilder::<(), _>::new(pool)
                 }
             } else {
                 //未指定任务池
                 quote_spanned! {last_stmt_start_span=>
-                    pi_async::rt::multi_thread::MultiTaskRuntimeBuilder::<(), _>::default()
+                    pi_async_rt::rt::multi_thread::MultiTaskRuntimeBuilder::<(), _>::default()
                 }
             }
         },
@@ -344,14 +344,14 @@ fn parse_async_macro(mut input: syn::ItemFn,
                         let rt = runner.startup().unwrap();
                         let rt_copy = rt.clone();
                         let thread_waker = runner.get_thread_waker().unwrap();
-                        pi_async::rt::spawn_worker_thread("Default-Main-RT",
+                        pi_async_rt::rt::spawn_worker_thread("Default-Main-RT",
                             2 * 1024 * 1024,
-                            Arc::new(AtomicBool::new(true)),
+                            std::sync::Arc::new(std::sync::atomic::AtomicBool::new(true)),
                             thread_waker,
                             10,
                             #timer_interval,
                             move || {
-                                let now = Instant::now();
+                                let now = std::time::Instant::now();
                                 if let Ok(len) = runner.run() {
                                     (len == 0, now.elapsed())
                                 } else {
@@ -372,14 +372,14 @@ fn parse_async_macro(mut input: syn::ItemFn,
                         let rt = runner.startup().unwrap();
                         let rt_copy = rt.clone();
                         let thread_waker = runner.get_thread_waker().unwrap();
-                        pi_async::rt::spawn_worker_thread("Default-Main-RT",
+                        pi_async_rt::rt::spawn_worker_thread("Default-Main-RT",
                             2 * 1024 * 1024,
-                            Arc::new(AtomicBool::new(true)),
+                            std::sync::Arc::new(std::sync::atomic::AtomicBool::new(true)),
                             thread_waker,
                             10,
                             #timer_interval,
                             move || {
-                                let now = Instant::now();
+                                let now = std::time::Instant::now();
                                 if let Ok(len) = runner.run() {
                                     (len == 0, now.elapsed())
                                 } else {
@@ -389,7 +389,7 @@ fn parse_async_macro(mut input: syn::ItemFn,
                             move || {
                                 rt_copy.len()
                             });
-                            rt.block_on::<SingleTaskPool<()>, _>(async #body);
+                            rt.block_on::<pi_async_rt::rt::single_thread::SingleTaskPool<()>, _>(async #body);
                     }
                 }).unwrap()
             }
@@ -408,7 +408,7 @@ fn parse_async_macro(mut input: syn::ItemFn,
                 //未指定任务池
                 syn::parse2(quote_spanned! {last_stmt_end_span=>
                     {
-                        #rt_builder.block_on::<StealableTaskPool<()>, _>(async #body);
+                        #rt_builder.block_on::<pi_async_rt::rt::multi_thread::StealableTaskPool<()>, _>(async #body);
                     }
                 }).unwrap()
             }
