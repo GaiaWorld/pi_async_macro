@@ -361,7 +361,7 @@ fn parse_async_macro(mut input: syn::ItemFn,
                             move || {
                                 rt_copy.len()
                             });
-                            rt.block_on::<#pool_type_name<()>, _>(async #body);
+                            rt.block_on(async #body);
                     }
                 }).unwrap()
             } else {
@@ -389,7 +389,7 @@ fn parse_async_macro(mut input: syn::ItemFn,
                             move || {
                                 rt_copy.len()
                             });
-                            rt.block_on::<pi_async_rt::rt::single_thread::SingleTaskPool<()>, _>(async #body);
+                            rt.block_on(async #body);
                     }
                 }).unwrap()
             }
@@ -401,14 +401,14 @@ fn parse_async_macro(mut input: syn::ItemFn,
                 let pool_type_name = syn::Ident::new(&pool_type, Span::call_site());
                 syn::parse2(quote_spanned! {last_stmt_end_span=>
                     {
-                        #rt_builder.block_on::<#pool_type_name<()>, _>(async #body);
+                        #rt_builder.block_on(async #body);
                     }
                 }).unwrap()
             } else {
                 //未指定任务池
                 syn::parse2(quote_spanned! {last_stmt_end_span=>
                     {
-                        #rt_builder.block_on::<pi_async_rt::rt::multi_thread::StealableTaskPool<()>, _>(async #body);
+                        #rt_builder.block_on(async #body);
                     }
                 }).unwrap()
             }
