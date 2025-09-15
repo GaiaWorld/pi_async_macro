@@ -337,7 +337,7 @@ fn parse_async_macro(mut input: syn::ItemFn,
 
             if let Some(pool_type) = pool_type {
                 //指定了任务池
-                let pool_type_name = syn::Ident::new(&pool_type, Span::call_site());
+                // let pool_type_name = syn::Ident::new(&pool_type, Span::call_site());
                 syn::parse2(quote_spanned! {last_stmt_end_span =>
                     {
                         #rt_builder
@@ -398,7 +398,7 @@ fn parse_async_macro(mut input: syn::ItemFn,
             //生成启动多线程运行时和执行异步主入口的代码
             if let Some(pool_type) = pool_type {
                 //指定了任务池
-                let pool_type_name = syn::Ident::new(&pool_type, Span::call_site());
+                // let pool_type_name = syn::Ident::new(&pool_type, Span::call_site());
                 syn::parse2(quote_spanned! {last_stmt_end_span=>
                     {
                         #rt_builder.block_on(async #body);
